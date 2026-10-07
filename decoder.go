@@ -46,7 +46,7 @@ func checkObjects(formatString string, messageValues []FirehoseItemType, itemTyp
 	// Increment index to get the actual firehose item data
 	if itemType == precisionItem {
 		index++
-		if index > len(messageValues) {
+		if index >= len(messageValues) {
 			return fmt.Sprintf("Index out of bounds for FirehoseItemInfo Vec. Got adjusted index %d, Vec size is %d. This should not have happened", index, len(messageValues))
 		}
 	}

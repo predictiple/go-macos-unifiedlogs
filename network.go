@@ -114,7 +114,7 @@ func getSockaddrData(input []byte) ([]byte, string, error) {
 		}
 		return remaining, fmt.Sprintf("%s:%d", ipAddr.String(), port), nil
 	case 30:
-		if len(rest) < 22 {
+		if len(rest) < 26 {
 			return nil, "", ErrEof
 		}
 		port := binary.BigEndian.Uint16(rest)

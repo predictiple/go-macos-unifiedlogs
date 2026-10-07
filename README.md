@@ -119,8 +119,7 @@ errors: they appear in the output with a diagnostic `Message`, such as
 
 ## Performance and caching
 
-A `StringCache` resolves UUIDText and DSC (shared cache) lookups. `CollectStrings` and
-`CollectSharedStrings` prefill it; otherwise entries are loaded lazily on first use via
+A `StringCache` resolves UUIDText and DSC (shared cache) lookups. Entries are loaded lazily on first use via
 `GetOrLoadUUIDText`/`GetOrLoadDSC`. Reuse one cache across every file in a bundle so
 lookups are not repeated.
 

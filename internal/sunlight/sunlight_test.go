@@ -141,7 +141,7 @@ func TestParseLengthTag(t *testing.T) {
 		112, 112, 115, 116, 111, 114, 101, 100, 46, 77, 105, 103, 114, 97, 116, 111, 114, 65, 114, 99,
 		97, 100, 101, 84, 97, 115, 107,
 	}
-	remaining, result, err := parseLengthTag(test)
+	remaining, result, err := parseLengthTag(test, 0)
 	if err != nil {
 		t.Fatalf("parseLengthTag: %v", err)
 	}

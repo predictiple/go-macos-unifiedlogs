@@ -124,6 +124,11 @@ func parseUnifiedLog(data []byte, evidence string) ([]byte, *UnifiedLogData, err
 		}
 		chunkSize := preamble.ChunkDataSize
 
+		// Check for overflow/wrap in chunk size
+		if chunkSize > ^uint64(0)-chunkPreambleSize {
+			return nil, nil, ErrTooLarge
+		}
+
 		// Grab all data associated with Unified Log entry (chunk)
 		if uint64(len(input)) < chunkSize+chunkPreambleSize {
 			return nil, nil, ErrTooLarge
@@ -150,11 +155,14 @@ func parseUnifiedLog(data []byte, evidence string) ([]byte, *UnifiedLogData, err
 		if uint64(len(data)) < paddingSize {
 			break
 		}
-		data = data[paddingSize:]
-		if len(data) == 0 {
+		nextData := data[paddingSize:]
+		if len(nextData) == 0 {
 			break
 		}
-		input = data
+		if len(nextData) == len(input) {
+			break
+		}
+		input = nextData
 		if len(input) < chunkPreambleSize {
 			logger.Printf("Not enough data for preamble header, needed 16 bytes. Got: %d", len(input))
 			break

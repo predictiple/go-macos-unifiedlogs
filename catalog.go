@@ -289,8 +289,12 @@ func parseCatalogProcessEntry(c *cursor, uuids []string) (ProcessInfoEntry, erro
 		return entry, err
 	}
 
-	uuidInfoEntries := make([]ProcessUUIDEntry, 0, numberUUIDsEntries)
-	for i := 0; i < int(numberUUIDsEntries); i++ {
+	numUUIDs := int(numberUUIDsEntries)
+	if numUUIDs > 10_000_000 { // clamp unreasonably large values
+		numUUIDs = 10_000_000
+	}
+	uuidInfoEntries := make([]ProcessUUIDEntry, 0, numUUIDs)
+	for i := 0; i < numUUIDs; i++ {
 		uuidEntry, err := parseProcessInfoUUIDEntry(c, uuids)
 		if err != nil {
 			return entry, err

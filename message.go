@@ -132,12 +132,12 @@ func FormatFirehoseLogMessage(formatString string, itemMessage []FirehoseItemTyp
 
 		precisionItems := []uint8{0x10, 0x12}
 		// If the item message was a precision type increment to actual value
-		if slices.Contains(precisionItems, itemMessage[itemIndex].ItemType) {
+		if itemIndex < len(itemMessage) && slices.Contains(precisionItems, itemMessage[itemIndex].ItemType) {
 			itemIndex++
 		}
 		// Also seen number type value 0 also used for dynamic width/precision value
 		dynamicPrecisionValue := uint8(0x0)
-		if itemMessage[itemIndex].ItemType == dynamicPrecisionValue &&
+		if itemIndex < len(itemMessage) && itemMessage[itemIndex].ItemType == dynamicPrecisionValue &&
 			itemMessage[itemIndex].ItemSize == 0 &&
 			strings.Contains(formatterString, "%*") {
 			itemIndex++

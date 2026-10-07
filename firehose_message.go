@@ -75,12 +75,13 @@ func extractSharedStrings(provider FileProvider, cache StringCache, stringOffset
 	if originalOffset&0x80000000 != 0 {
 		sharedString, err := cache.GetOrLoadDSC(dscUUID, provider)
 		if err == nil && sharedString != nil && len(sharedString.Ranges) > 0 {
-			uuidIndex := int(sharedString.Ranges[0].UUIDIndex)
-			if uuidIndex >= len(sharedString.UUIDs) {
-				logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndex, len(sharedString.UUIDs))
+			uuidIndexUint := sharedString.Ranges[0].UUIDIndex
+			if uuidIndexUint >= uint64(len(sharedString.UUIDs)) {
+				logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndexUint, len(sharedString.UUIDs))
 				messageData.FormatString = "Error: Invalid UUID index"
 				return []byte{}, messageData, nil
 			}
+			uuidIndex := int(uuidIndexUint)
 
 			messageData.Library = sharedString.UUIDs[uuidIndex].PathString
 			messageData.LibraryUUID = sharedString.UUIDs[uuidIndex].UUID
@@ -119,12 +120,13 @@ func extractSharedStrings(provider FileProvider, cache StringCache, stringOffset
 				}
 				messageData.FormatString = messageString
 
-				uuidIndex := int(ranges.UUIDIndex)
-				if uuidIndex >= len(sharedString.UUIDs) {
-					logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndex, len(sharedString.UUIDs))
+				uuidIndexUint := ranges.UUIDIndex
+				if uuidIndexUint >= uint64(len(sharedString.UUIDs)) {
+					logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndexUint, len(sharedString.UUIDs))
 					messageData.FormatString = "Error: Invalid UUID index"
 					return []byte{}, messageData, nil
 				}
+				uuidIndex := int(uuidIndexUint)
 
 				messageData.Library = sharedString.UUIDs[uuidIndex].PathString
 				messageData.LibraryUUID = sharedString.UUIDs[uuidIndex].UUID
@@ -144,12 +146,13 @@ func extractSharedStrings(provider FileProvider, cache StringCache, stringOffset
 	// Apple reports as "~~> <Invalid shared cache code pointer offset>" or <Invalid shared cache format string offset>
 	if sharedString, err := cache.GetOrLoadDSC(dscUUID, provider); err == nil && sharedString != nil {
 		if len(sharedString.Ranges) > 0 {
-			uuidIndex := int(sharedString.Ranges[0].UUIDIndex)
-			if uuidIndex >= len(sharedString.UUIDs) {
-				logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndex, len(sharedString.UUIDs))
+			uuidIndexUint := sharedString.Ranges[0].UUIDIndex
+			if uuidIndexUint >= uint64(len(sharedString.UUIDs)) {
+				logger.Printf("[macos-unifiedlogs] UUID index %d out of bounds (max: %d). Malformed data.", uuidIndexUint, len(sharedString.UUIDs))
 				messageData.FormatString = "Error: Invalid UUID index"
 				return []byte{}, messageData, nil
 			}
+			uuidIndex := int(uuidIndexUint)
 
 			messageData.Library = sharedString.UUIDs[uuidIndex].PathString
 			messageData.LibraryUUID = sharedString.UUIDs[uuidIndex].UUID

@@ -50,6 +50,11 @@ loop:
 		}
 		chunkSize := preamble.ChunkDataSize
 
+		if chunkSize > ^uint64(0)-chunkPreambleSize {
+			logger.Printf("Failed to nom chunk bytes")
+			return nil, false
+		}
+
 		// Grab all data associated with Unified Log entry (chunk)
 		data, chunkData, err := nomBytes(input, chunkSize+chunkPreambleSize)
 		if err != nil {
@@ -77,16 +82,20 @@ loop:
 			u.Data = nil
 			break
 		}
-		data, _, err = nomBytes(data, paddingSize)
+		nextData, _, err := nomBytes(data, paddingSize)
 		if err != nil {
 			logger.Printf("Failed to nom log end padding")
 			return nil, false
 		}
-		if len(data) == 0 {
+		if len(nextData) == 0 {
 			u.Data = nil
 			break
 		}
-		input = data
+		if len(nextData) == len(input) {
+			u.Data = nil
+			break
+		}
+		input = nextData
 		if len(input) < chunkPreambleSize {
 			logger.Printf("Not enough data for preamble header, needed 16 bytes. Got: %d", len(input))
 			u.Data = nil

@@ -66,7 +66,7 @@ func ExtractProtobuf(data []byte) (map[string]any, error) {
 }
 
 // parseTag extracts the Protobuf values from the provided data.
-func parseTag(data []byte) (map[string]any, error) {
+func parseTagWithDepth(data []byte, depth int) (map[string]any, error) {
 	protoData := data
 	protoMap := map[string]any{}
 
@@ -83,7 +83,7 @@ func parseTag(data []byte) (map[string]any, error) {
 		case WireTypeFixed64:
 			input, value, err = parseFixed64(input)
 		case WireTypeLen:
-			input, value, err = parseLengthTag(input)
+			input, value, err = parseLengthTag(input, depth+1)
 		case WireTypeStartGroup:
 			logger.Printf("[sunlight] got start group wiretype. This is deprecated, ending parsing now. Returning base64 as final result")
 			value = base64.StdEncoding.EncodeToString(input)
@@ -120,6 +120,11 @@ func parseTag(data []byte) (map[string]any, error) {
 	}
 
 	return protoMap, nil
+}
+
+// parseTag extracts the Protobuf values from the provided data.
+func parseTag(data []byte) (map[string]any, error) {
+	return parseTagWithDepth(data, 0)
 }
 
 // protoTag builds the JSON representation of a ProtoTag.
@@ -269,7 +274,11 @@ func parseFixed32(data []byte) ([]byte, any, error) {
 
 // parseLengthTag parses length based tags. The value can be either a string or
 // a nested object (sub-message).
-func parseLengthTag(data []byte) ([]byte, any, error) {
+func parseLengthTag(data []byte, depth int) ([]byte, any, error) {
+	const maxDepth = 256
+	if depth > maxDepth {
+		return nil, nil, fmt.Errorf("max depth exceeded")
+	}
 	input, valueLength, err := parseVarLen(data)
 	if err != nil {
 		return nil, nil, err
@@ -284,7 +293,7 @@ func parseLengthTag(data []byte) ([]byte, any, error) {
 
 	// If we fail, fallback to sub-message parsing.
 	if strings.HasPrefix(message, "Failed to get UTF8 string") {
-		sub, err := parseTag(valueData)
+		sub, err := parseTagWithDepth(valueData, depth+1)
 		if err != nil {
 			// If not string or submessage might be raw bytes.
 			return input, base64.StdEncoding.EncodeToString(valueData), nil
