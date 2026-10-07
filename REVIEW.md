@@ -22,6 +22,8 @@ Every finding is tagged **Go-introduced** (the port diverges from Rust) or **inh
 
 **Baseline (re-verified at report time):** `gofmt -l` clean, `go vet ./...` clean, `go test ./...` PASS (root + `internal/sunlight`).
 
+**Post-fix updates (2026-10-07):** Applied fixes for #3 (AF_INET6 bounds guard), #4 (UUIDIndex uint64 comparison), #5 (catalog preallocation clamp), #1-#2 (chunk size wrap + progress guards), #6-#7 (bounds/order checks), #8 (sunlight depth cap), #11 (README cache prefilling). All changes committed.
+
 ---
 
 ## Summary
