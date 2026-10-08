@@ -2,3 +2,4 @@ reference/
 tests/test_data/
 *.logarchive
 test*.zip
+unifiedlog_parser
